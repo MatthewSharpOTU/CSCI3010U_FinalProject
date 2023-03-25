@@ -28,7 +28,7 @@ p = False
 peg_collide = []
 
 # static variable for all peg locations
-pegs = [[60, 120], [60, 200], [60, 280], [60, 360], [60, 440], [60,520]]
+pegs = [[660, 80], [660, 160], [660, 240], [660, 320], [660, 400], [660,480], [660, 540]]
 
 # Class to keep track of the disk
 class MyCircle(pygame.sprite.Sprite):
@@ -76,7 +76,7 @@ class Simulation:
         self.solver.set_initial_value(self.state, self.t)
 
     def is_collision(self, state):
-        if (state[0] <= 80 or state[0] >= 680):
+        if (state[0] <= 110 or state[0] >= 650):
             return True
         elif (state[1]>=560):
             if ((state[0]>=85 and state[0]<=100) or
@@ -93,16 +93,15 @@ class Simulation:
                 (state[0]<=515 and state[0]>=500) or
                 (state[0]>=565 and state[0]<=580) or
                 (state[0]<=595 and state[0]>=580) or
-                (state[0]>=645 and state[0]<=660) or
-                (state[0]<=675 and state[0]>=660)):
-                return True
+                (state[0]>=645 and state[0]<=660)):
+                    return True
             
         return False
 
     def peg_collision(self, state):
         for i in range(len(pegs)):
             #print(pegs[i][0]-20)
-            if ((state[0]>=(pegs[i][0]-15) and state[0]<=(pegs[i][0]+15)) and (state[1]>=(pegs[i][1]-15) and state[1]<=(pegs[i][1]+15))):
+            if ((state[0]>=(pegs[i][0]-17) and state[0]<=(pegs[i][0]+17)) and (state[1]>=(pegs[i][1]-17) and state[1]<=(pegs[i][1]+17))):
                 print(pegs[i], "ji")
                 self.peg_local = pegs[i]
                 return True
@@ -121,10 +120,10 @@ class Simulation:
 
             print(self.peg_collision(self.state))
             
-            if self.is_collision(self.state):
+            if self.is_collision(self.state) and self.count > 5:
                 self.state[2] = -1*self.state[2]
                 #print("hello")
-            if self.peg_collision(self.state) and self.count > 15:
+            if self.peg_collision(self.state) and self.count > 5:
                 #print("how are you")
                 print(peg_collide)
                 dist = math.sqrt(pow(self.peg_local[0]-self.state[0], 2) + pow(self.peg_local[1]-self.state[1],2))
@@ -154,12 +153,12 @@ def sim_to_screen(win_width, win_height, x, y):
     return win_width//2 + x, win_height//2 - y
 
 # Setup of Sim
-my_sprite = MyCircle(RED, 15, 15)
+my_sprite = MyCircle(RED, 17, 17)
 my_group = pygame.sprite.Group([my_sprite])
 
 # Manipulate to Change the Drop Location of the Puck
 sim = Simulation()
-sim.setup(230.0, 25.0)
+sim.setup(384.0, 50.0)
 
 print('--------------------------------')
 print('Usage:')
@@ -190,18 +189,18 @@ while running:
             #y = 60 + j * 40
            # pygame.draw.circle(window, BLUE, (x, y), 18)
 
-    pygame.draw.circle(window, RED, (sim.state[0], sim.state[1]), 15)
+    pygame.draw.circle(window, RED, (sim.state[0], sim.state[1]), 17)
 
-
-    pygame.draw.circle(window, GRAY, (60, 120), 5)
-    pygame.draw.circle(window, GRAY, (60, 200), 5)
-    pygame.draw.circle(window, GRAY, (60, 280), 5)
-    pygame.draw.circle(window, GRAY, (60, 360), 5)
-    pygame.draw.circle(window, GRAY, (60, 440), 5)
-    pygame.draw.circle(window, GRAY, (60, 520), 5)
+    pygame.draw.circle(window, GRAY, (660, 80), 5)
+    pygame.draw.circle(window, GRAY, (660, 160), 5)
+    pygame.draw.circle(window, GRAY, (660, 240), 5)
+    pygame.draw.circle(window, GRAY, (660, 320), 5)
+    pygame.draw.circle(window, GRAY, (660, 400), 5)
+    pygame.draw.circle(window, GRAY, (660, 480), 5)
+    pygame.draw.circle(window, GRAY, (660, 560), 5)
 
     # Draw the pegs
-    for i in range(8):
+    for i in range(7):
         for j in range(13):
             x = 100 + i * 80 + j % 2 * 40
             y = 80 + j * 40
@@ -213,18 +212,28 @@ while running:
     if (p==False):
         p = True
 
-    pygame.draw.line(window, BLACK, (60, 80), (60, 600))
-    pygame.draw.line(window, BLACK, (700, 80), (700, 600))
-    pygame.draw.line(window, BLACK, (60, 600), (700, 600))
+    # pygame.draw.line(window, BLACK, (60, 80), (60, 600))
+    # pygame.draw.line(window, BLACK, (700, 80), (700, 600))
+    # pygame.draw.line(window, BLACK, (60, 600), (700, 600))
 
-    pygame.draw.line(window, BLACK, (100, 560), (100, 600))
+    # pygame.draw.line(window, BLACK, (100, 560), (100, 600))
+    # pygame.draw.line(window, BLACK, (180, 560), (180, 600))
+    # pygame.draw.line(window, BLACK, (260, 560), (260, 600))
+    # pygame.draw.line(window, BLACK, (340, 560), (340, 600))
+    # pygame.draw.line(window, BLACK, (420, 560), (420, 600))
+    # pygame.draw.line(window, BLACK, (500, 560), (500, 600))
+    # pygame.draw.line(window, BLACK, (580, 560), (580, 600))
+    # pygame.draw.line(window, BLACK, (660, 560), (660, 600))
+    pygame.draw.line(window, BLACK, (100, 80), (100, 600))
+    pygame.draw.line(window, BLACK, (660, 80), (660, 600))
+    pygame.draw.line(window, BLACK, (100, 600), (660, 600))
+
     pygame.draw.line(window, BLACK, (180, 560), (180, 600))
     pygame.draw.line(window, BLACK, (260, 560), (260, 600))
     pygame.draw.line(window, BLACK, (340, 560), (340, 600))
     pygame.draw.line(window, BLACK, (420, 560), (420, 600))
     pygame.draw.line(window, BLACK, (500, 560), (500, 600))
     pygame.draw.line(window, BLACK, (580, 560), (580, 600))
-    pygame.draw.line(window, BLACK, (660, 560), (660, 600))
 
     if sim.state[1] >= 585.:
             pygame.quit()
