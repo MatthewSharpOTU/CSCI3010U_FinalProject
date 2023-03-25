@@ -51,8 +51,8 @@ class Simulation:
     def __init__(self):
         self.state = [0.0, 0.0, 0.0 ,0.0]
         self.t = 0
-        self.dt = 0.033
-        self.mass = 1
+        self.dt = 0.025
+        self.mass = 5
         self.gamma = 0.0001
         self.gravity = 9.8
         self.count = 10
@@ -65,8 +65,8 @@ class Simulation:
     def f(self, t, state, args1, args2):
         dx = state[2]
         dy = state[3]
-        dvx = state[2] * args1
-        dvy = args2 - state[3] * args1
+        dvx = (state[2] * args1) * self.mass
+        dvy = (args2 - state[3] * args1) * self.mass
         return [dx, dy, dvx, dvy]
 
     def setup(self, x, y):
@@ -79,22 +79,22 @@ class Simulation:
         if (state[0] <= 80 or state[0] >= 680):
             return True
         elif (state[1]>=560):
-            if ((state[0]>=80 and state[0]<=100) or
-                (state[0]<=120 and state[0]>=100) or
-                (state[0]>=160 and state[0]<=180) or
-                (state[0]<=200 and state[0]>=180) or
-                (state[0]>=240 and state[0]<=260) or
-                (state[0]<=280 and state[0]>=260) or
-                (state[0]>=320 and state[0]<=340) or
-                (state[0]<=360 and state[0]>=340) or
-                (state[0]>=400 and state[0]<=420) or
-                (state[0]<=440 and state[0]>=420) or
-                (state[0]>=480 and state[0]<=500) or
-                (state[0]<=520 and state[0]>=500) or
-                (state[0]>=560 and state[0]<=570) or
-                (state[0]<=600 and state[0]>=590) or
-                (state[0]>=640 and state[0]<=650) or
-                (state[0]<=680 and state[0]>=660)):
+            if ((state[0]>=85 and state[0]<=100) or
+                (state[0]<=115 and state[0]>=100) or
+                (state[0]>=165 and state[0]<=180) or
+                (state[0]<=195 and state[0]>=180) or
+                (state[0]>=245 and state[0]<=260) or
+                (state[0]<=275 and state[0]>=260) or
+                (state[0]>=325 and state[0]<=340) or
+                (state[0]<=355 and state[0]>=340) or
+                (state[0]>=405 and state[0]<=420) or
+                (state[0]<=435 and state[0]>=420) or
+                (state[0]>=485 and state[0]<=500) or
+                (state[0]<=515 and state[0]>=500) or
+                (state[0]>=565 and state[0]<=580) or
+                (state[0]<=595 and state[0]>=580) or
+                (state[0]>=645 and state[0]<=660) or
+                (state[0]<=675 and state[0]>=660)):
                 return True
             
         return False
@@ -102,7 +102,7 @@ class Simulation:
     def peg_collision(self, state):
         for i in range(len(pegs)):
             #print(pegs[i][0]-20)
-            if ((state[0]>=(pegs[i][0]-12) and state[0]<=(pegs[i][0]+12)) and (state[1]>=(pegs[i][1]-12) and state[1]<=(pegs[i][1]+12))):
+            if ((state[0]>=(pegs[i][0]-15) and state[0]<=(pegs[i][0]+15)) and (state[1]>=(pegs[i][1]-15) and state[1]<=(pegs[i][1]+15))):
                 print(pegs[i], "ji")
                 self.peg_local = pegs[i]
                 return True
@@ -124,23 +124,24 @@ class Simulation:
             if self.is_collision(self.state):
                 self.state[2] = -1*self.state[2]
                 #print("hello")
-            if self.peg_collision(self.state) and self.count > 25:
+            if self.peg_collision(self.state) and self.count > 15:
                 #print("how are you")
                 print(peg_collide)
                 dist = math.sqrt(pow(self.peg_local[0]-self.state[0], 2) + pow(self.peg_local[1]-self.state[1],2))
                 normal = (self.state[0:2]-self.peg_local)/dist
-                #print(normal)
+                print(normal)
                 angle = math.acos((self.state[2]*normal[0]+self.state[3]*normal[1])/((math.sqrt(pow(self.state[2],2) + pow(self.state[3],2)))*(math.sqrt(pow(normal[0],2) + pow(normal[1],2)))))
+                angle -= 3.14/2
                 vel = math.sqrt(pow(self.state[2], 2) + pow(self.state[3], 2))
                 
-                self.state[2] = vel * np.cos(angle) * 0.9
-                self.state[3] = vel * np.sin(angle) * 0.9
+                self.state[2] = vel * -np.cos(angle) * 0.75
+                self.state[3] = vel * -np.sin(angle) * 0.75
                 self.count = 0
                 
                 if (self.state[0]> self.peg_local[0]):
                     self.state[2] = -1*self.state[2]
-                #print(angle)
-                #print(vel)
+                print(angle)
+                print(vel)
                 
             
     
@@ -158,7 +159,7 @@ my_group = pygame.sprite.Group([my_sprite])
 
 # Manipulate to Change the Drop Location of the Puck
 sim = Simulation()
-sim.setup(231.0, 25.0)
+sim.setup(230.0, 25.0)
 
 print('--------------------------------')
 print('Usage:')
