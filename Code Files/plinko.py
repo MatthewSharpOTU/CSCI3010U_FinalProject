@@ -156,7 +156,7 @@ def sim_to_screen(win_width, win_height, x, y):
 my_sprite = MyCircle(RED, 15, 15)
 my_group = pygame.sprite.Group([my_sprite])
 
-
+# Manipulate to Change the Drop Location of the Puck
 sim = Simulation()
 sim.setup(231.0, 25.0)
 
