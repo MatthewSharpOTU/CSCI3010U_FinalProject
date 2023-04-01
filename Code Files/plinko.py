@@ -52,11 +52,14 @@ class Simulation:
         self.state = [0.0, 0.0, 0.0 ,0.0]
         self.t = 0
         self.dt = 0.025
-        self.mass = 5
+        self.mass = 10
         self.gamma = 0.0001
         self.gravity = 9.8
         self.count = 10
         self.peg_local = []
+        self.trace_x = 0
+        self.trace_y = 0
+        self.resting = False
         
         self.solver = ode(self.f)
         self.solver.set_integrator('dop853')
@@ -67,16 +70,22 @@ class Simulation:
         dy = state[3]
         dvx = (state[2] * args1) * self.mass
         dvy = (args2 - state[3] * args1) * self.mass
+        if (self.resting):
+            dvy = 0
         return [dx, dy, dvx, dvy]
 
     def setup(self, x, y):
         self.state[0] = x
         self.state[1] = y
         
+        self.trace_x = [self.state[0]]
+        self.trace_y = [self.state[1]]
+        
         self.solver.set_initial_value(self.state, self.t)
 
+
     def is_collision(self, state):
-        if (state[0] <= 110 or state[0] >= 650):
+        if (state[0] <= 115 or state[0] >= 645):
             return True
         elif (state[1]>=560):
             if ((state[0]>=85 and state[0]<=100) or
@@ -101,11 +110,14 @@ class Simulation:
     def peg_collision(self, state):
         for i in range(len(pegs)):
             #print(pegs[i][0]-20)
-            if ((state[0]>=(pegs[i][0]-17) and state[0]<=(pegs[i][0]+17)) and (state[1]>=(pegs[i][1]-17) and state[1]<=(pegs[i][1]+17))):
+            if ((state[0]>=(pegs[i][0]-15) and state[0]<=(pegs[i][0]+15)) and (state[1]>=(pegs[i][1]-15) and state[1]<=(pegs[i][1]+15))):
                 print(pegs[i], "ji")
                 self.peg_local = pegs[i]
                 return True
-        return False    
+        return False  
+    
+    def ball_collision(self, state):
+        return True  
 
     def step(self):
         
@@ -120,9 +132,16 @@ class Simulation:
 
             print(self.peg_collision(self.state))
             
+            if self.state[1] >= 585.:
+                self.resting = True
+                self.state[3] = 0
+                self.state[2] = 0
+            
             if self.is_collision(self.state) and self.count > 5:
                 self.state[2] = -1*self.state[2]
                 #print("hello")
+            if self.ball_collision(self.state) and self.count > 5:
+                print("ball hit")
             if self.peg_collision(self.state) and self.count > 5:
                 #print("how are you")
                 print(peg_collide)
@@ -133,14 +152,17 @@ class Simulation:
                 angle -= 3.14/2
                 vel = math.sqrt(pow(self.state[2], 2) + pow(self.state[3], 2))
                 
-                self.state[2] = vel * -np.cos(angle) * 0.75
-                self.state[3] = vel * -np.sin(angle) * 0.75
+                self.state[2] = vel * -np.cos(angle) * 0.5
+                self.state[3] = vel * -np.sin(angle) * 0.5
                 self.count = 0
                 
                 if (self.state[0]> self.peg_local[0]):
                     self.state[2] = -1*self.state[2]
                 print(angle)
                 print(vel)
+                
+            self.trace_x.append(self.state[0])
+            self.trace_y.append(self.state[1])
                 
             
     
@@ -153,12 +175,13 @@ def sim_to_screen(win_width, win_height, x, y):
     return win_width//2 + x, win_height//2 - y
 
 # Setup of Sim
-my_sprite = MyCircle(RED, 17, 17)
+my_sprite = MyCircle(RED, 15, 15)
 my_group = pygame.sprite.Group([my_sprite])
 
 # Manipulate to Change the Drop Location of the Puck
 sim = Simulation()
-sim.setup(384.0, 50.0)
+sim.setup(325.0, 50.0)
+
 
 print('--------------------------------')
 print('Usage:')
@@ -189,7 +212,7 @@ while running:
             #y = 60 + j * 40
            # pygame.draw.circle(window, BLUE, (x, y), 18)
 
-    pygame.draw.circle(window, RED, (sim.state[0], sim.state[1]), 17)
+    pygame.draw.circle(window, RED, (sim.state[0], sim.state[1]), 15)
 
     pygame.draw.circle(window, GRAY, (660, 80), 5)
     pygame.draw.circle(window, GRAY, (660, 160), 5)
@@ -234,6 +257,9 @@ while running:
     pygame.draw.line(window, BLACK, (420, 560), (420, 600))
     pygame.draw.line(window, BLACK, (500, 560), (500, 600))
     pygame.draw.line(window, BLACK, (580, 560), (580, 600))
+    
+    for i in range(len(sim.trace_x)-1):
+        pygame.draw.line(window, RED, (sim.trace_x[i], sim.trace_y[i]), (sim.trace_x[i+1], sim.trace_y[i+1]), width=3)
 
     if sim.state[1] >= 585.:
             pygame.quit()
